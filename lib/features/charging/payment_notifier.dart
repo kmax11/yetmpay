@@ -124,6 +124,11 @@ class PaymentNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  void markSuccess() {
+    _status = PaymentStatus.success;
+    notifyListeners();
+  }
+
   void decline(String reason) {
     _declineReason = reason;
     _status = PaymentStatus.declined;

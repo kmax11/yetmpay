@@ -80,8 +80,8 @@ class _FaceScanScreenState extends State<FaceScanScreen>
   }
 
   void _handleVerificationComplete() {
-    context.read<PaymentNotifier>().processPayment();
-    context.pushReplacement('/payment-processing');
+    context.read<PaymentNotifier>().markSuccess();
+    context.pushReplacement('/payment-success');
   }
 
   @override
