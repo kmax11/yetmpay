@@ -81,69 +81,7 @@ class _FaceScanScreenState extends State<FaceScanScreen>
 
   void _handleVerificationComplete() {
     context.read<PaymentNotifier>().processPayment();
-
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadius.cardLargeAll,
-          ),
-          contentPadding: const EdgeInsets.all(AppSpacing.xxl),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: const BoxDecoration(
-                  color: AppColors.railSuccessBg,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  AppIcons.checkCircle,
-                  color: AppColors.railGreen,
-                  size: 40,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                'Payment Confirmed',
-                style: AppTextStyles.heading2.copyWith(
-                  color: AppColors.darkText,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Instant settlement deposit received.',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.mutedText,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<PaymentNotifier>().reset();
-                  Navigator.of(ctx).pop();
-                  context.go('/terminal');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: AppColors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: AppRadius.buttonPrimaryAll,
-                  ),
-                  minimumSize: const Size.fromHeight(48),
-                ),
-                child: const Text('Back to Terminal'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+    context.pushReplacement('/payment-processing');
   }
 
   @override
@@ -264,12 +202,7 @@ class _FaceScanScreenState extends State<FaceScanScreen>
                 ),
                 child: TextButton.icon(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Switched to fingerprint sensor mode.'),
-                        duration: Duration(seconds: 1),
-                      ),
-                    );
+                    context.pushReplacement('/payment-processing');
                   },
                   icon: const Icon(
                     AppIcons.fingerprint,
