@@ -26,6 +26,9 @@ abstract final class AppRadius {
   static BorderRadius get buttonPrimaryAll => BorderRadius.circular(buttonPrimary);
   static BorderRadius get buttonSmallAll => BorderRadius.circular(buttonSmall);
   static BorderRadius get inputAll => BorderRadius.circular(input);
+  static BorderRadius get inputBR => inputAll;
+  static BorderRadius get cardBR => cardLargeAll;
+  static BorderRadius get buttonPrimaryBR => buttonPrimaryAll;
   static BorderRadius get badgeAll => BorderRadius.circular(badge);
   static BorderRadius get badgeSmallAll => BorderRadius.circular(badgeSmall);
   static BorderRadius get viewportAll => BorderRadius.circular(viewport);
