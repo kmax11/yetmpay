@@ -9,6 +9,7 @@ import '../../core/widgets/app_card.dart';
 import '../../core/widgets/app_input_field.dart';
 import '../../core/widgets/app_primary_button.dart';
 import '../../core/widgets/app_text_link_button.dart';
+import '../registration/registration_notifier.dart';
 import 'auth_notifier.dart';
 
 /// Merchant Login Screen with demo login support and lockout handling.
@@ -20,8 +21,16 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _identifierController = TextEditingController();
+  late final TextEditingController _identifierController;
   final _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-fill the phone number if coming straight from registration
+    final reg = context.read<RegistrationNotifier>();
+    _identifierController = TextEditingController(text: reg.phone);
+  }
 
   @override
   void dispose() {
