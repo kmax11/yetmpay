@@ -35,5 +35,18 @@ abstract final class AppIcons {
   static const IconData locationPin = Symbols.location_on;
   static const IconData bulb = Symbols.lightbulb;
   static const IconData mobile = Symbols.smartphone;
+  static const IconData warning = Symbols.warning;
+  static const IconData print = Symbols.print;
+  static const IconData search = Symbols.search;
+  static const IconData filterList = Symbols.filter_list;
+  static const IconData refresh = Symbols.refresh;
+  static const IconData shield = Symbols.security;
+  static const IconData logout = Symbols.logout;
+  static const IconData call = Symbols.call;
+  static const IconData language = Symbols.language;
+  static const IconData volumeOn = Symbols.volume_up;
+  static const IconData sms = Symbols.sms;
+  static const IconData receipt = Symbols.receipt;
+  static const IconData cancel = Symbols.cancel;
 }
 

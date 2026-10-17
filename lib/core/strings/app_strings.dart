@@ -113,5 +113,106 @@ abstract final class AppStrings {
   static const demoNote = 'Demo: use any credentials in debug mode';
   static const lockedOut = 'Too many attempts. Try again in';
   static const seconds = 'seconds';
+
+  // ── Payment Declined ──────────────────────────────────────────────────────
+  static const paymentDeclined = 'PAYMENT DECLINED';
+  static const identityNotVerified = 'Identity not verified';
+  static const errBioMismatch = 'ERR_BIO_MISMATCH';
+  static const faceContourFailed = 'Facial contour did not reach the 85% minimum '
+      'confidence threshold required for Fayda biometric authorization.';
+  static const nationalFaydaId = 'National Fayda ID';
+  static const cameraConfidence = 'Camera Confidence';
+  static const minConfidence = 'Min. 85%';
+  static const recommendedNextStep = 'Recommended Next Step';
+  static const repositionCustomer =
+      'Ask the customer to remove glasses or hat, ensure good lighting, '
+      'and position face fully within the scan oval.';
+  static const tryFaceScanAgain = 'Try face scan again';
+  static const useOtpFallback = 'Use OTP fallback';
+
+  // ── Payment Processing ────────────────────────────────────────────────────
+  static const paymentInProgress = 'Payment in progress';
+  static const biometricInstantAuth = 'Biometric instant authorization';
+  static const verifyingIdentity = 'Verifying identity';
+  static const twoFactorConfirmed = 'Two-factor credentials confirmed';
+  static const checkingBalance = 'Checking balance';
+  static const queryingLiquidity = 'Querying linked settlement liquidity';
+  static const completingPayment = 'Completing payment';
+  static const awaitingClearance = 'Awaiting ledger clearance';
+  static const inProgressLabel = 'In Progress';
+  static const pendingLabel = 'Pending';
+  static const tlsSecured = '256-bit TLS encrypted transaction \u2022 Secured';
+  static const settlementDisclaimer =
+      'Average settlement time: 1.8s \u2022 Direct Telebirr / CBE rail. '
+      'Please do not close or refresh this application.';
+
+  // ── Payment Success ───────────────────────────────────────────────────────
+  static const settledVerified = 'Settled & Verified';
+  static const paymentSuccessful = 'Payment successful';
+  static const paymentDetails = 'Payment details';
+  static const instantSettlement = 'Instant settlement';
+  static const biometricVerified = 'Biometric verified';
+  static const paymentRailLabel = 'Payment rail';
+  static const terminalLabel = 'Terminal';
+  static const transactionRef = 'Transaction ref';
+  static const zeroDisputeGuarantee =
+      'Zero dispute guarantee \u2022 Telebirr instant rail';
+  static const newSale = 'New sale';
+  static const sendReceipt = 'Send receipt';
+
+  // ── Transactions ──────────────────────────────────────────────────────────
+  static const transactionsTitle = 'Transactions';
+  static const realtimeActivity = 'Real-time payment activity and settlement';
+  static const utcLabel = 'UTC+3 (Addis Ababa)';
+  static const todaySettledVolume = "TODAY'S SETTLED VOLUME";
+  static const syncedLabel = 'Synced';
+  static const autoClears = 'Auto-clears at 00:00';
+  static const searchPlaceholder = 'Search by customer name or ref #';
+  static const recentRecords = 'RECENT RECORDS';
+  static const selectedReceipt = 'Selected Transaction Receipt';
+  static const printReceiptBtn = 'Print Receipt';
+  static const reportIssue = 'Report Issue';
+  static const directBoleHub = 'Direct Bole Hub Gateway';
+  static const dailyStatement = 'Daily statement download';
+  static const paidLabel = 'Paid';
+  static const declinedLabel = 'Declined';
+  static const todayFilter = 'Today';
+  static const thisWeekFilter = 'This week';
+  static const thisMonthFilter = 'This month';
+
+  // ── Settings ─────────────────────────────────────────────────────────────
+  static const settingsTitle = 'Settings';
+  static const activePOS = 'Active POS';
+  static const settlementRailsSection = 'SETTLEMENT & RAILS';
+  static const realTimeRTGS = 'Real-time RTGS';
+  static const payoutAccount = 'Payout Account Default';
+  static const payoutAccountSub = 'Telebirr \u2022\u2022\u2022 8821';
+  static const connectedBanks = 'Connected Banks';
+  static const connectedBanksSub = 'CBE, Awash, Dashen \u2022 3 rails linked';
+  static const transactionLimit = 'Transaction Limit';
+  static const transactionLimitSub = '50,000 ETB / txn \u2022 Tier 2 clearance';
+  static const terminalPreferencesSection = 'TERMINAL PREFERENCES';
+  static const languageLabel = 'Language';
+  static const languageSub = 'Active terminal language';
+  static const audioAnnouncement = 'Audio Announcement';
+  static const audioAnnouncementSub = 'Vocal confirmation on settled payment';
+  static const autoPromptReceipt = 'Auto-Prompt Receipt';
+  static const autoPromptReceiptSub = 'SMS or QR download after sale';
+  static const supportDeviceSection = 'SUPPORT & DEVICE TRUST';
+  static const helpMerchantSupport = 'Help & Merchant Support';
+  static const helpMerchantSupportSub = 'Toll-Free 8821 \u2022 24/7 Desk';
+  static const callNow = 'Call Now';
+  static const securityEncryption = 'Security & Encryption';
+  static const securityEncryptionSub = 'Hardware Key Active';
+  static const securityVerified = '\u2713 Verified';
+  static const yetmpayPOSCore = 'YETMpay POS Core';
+  static const posCoreSub = 'Build v3.8.4-rel (Up to date) \u2022 SHA-a9f2c1';
+  static const posCoreVersion = 'v3.8.4';
+  static const logOutTerminal = 'Log out from terminal';
+  static const logoutCaption =
+      'Logging out terminates the active session on this POS terminal.';
+  static const langEnglish = 'English';
+  static const langAmharic = '\u12a0\u121b\u122d\u129b';
 }
+
 
