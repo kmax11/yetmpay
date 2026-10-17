@@ -155,29 +155,32 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // ── Title & Timezone Row ─────────────────────────────────────
+              // ── Title & Timezone Row (Responsive with Expanded) ──────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppStrings.transactionsTitle,
-                        style: AppTextStyles.heading1.copyWith(
-                          color: AppColors.darkText,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppStrings.transactionsTitle,
+                          style: AppTextStyles.heading1.copyWith(
+                            color: AppColors.darkText,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        AppStrings.realtimeActivity,
-                        style: AppTextStyles.bodyXS.copyWith(
-                          color: AppColors.mutedText,
+                        const SizedBox(height: 2),
+                        Text(
+                          AppStrings.realtimeActivity,
+                          style: AppTextStyles.bodyXS.copyWith(
+                            color: AppColors.mutedText,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.sm,
@@ -200,7 +203,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // ── Today's Settled Volume Card ──────────────────────────────
+              // ── Today's Settled Volume Card (Responsive Wrap) ─────────────
               AppCard(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Row(
@@ -231,7 +234,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             ),
                           ),
                           const SizedBox(height: 2),
-                          Row(
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: AppSpacing.sm,
+                            runSpacing: 4,
                             children: [
                               Text(
                                 '${notifier.todaySettledVolume.toStringAsFixed(2)} ETB',
@@ -240,7 +246,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                   fontSize: 22,
                                 ),
                               ),
-                              const SizedBox(width: AppSpacing.sm),
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6,
@@ -323,27 +328,37 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ),
               const SizedBox(height: AppSpacing.md),
 
-              // ── Filter Pills Row ─────────────────────────────────────────
+              // ── Filter Pills Row (Horizontally Scrollable to Prevent Overflow) ─
               Row(
                 children: [
-                  _buildFilterPill(
-                    label: '${AppStrings.todayFilter} 4',
-                    isActive: notifier.selectedFilter == TransactionFilter.today,
-                    onTap: () => notifier.setFilter(TransactionFilter.today),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        children: [
+                          _buildFilterPill(
+                            label: '${AppStrings.todayFilter} 4',
+                            isActive: notifier.selectedFilter == TransactionFilter.today,
+                            onTap: () => notifier.setFilter(TransactionFilter.today),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          _buildFilterPill(
+                            label: AppStrings.thisWeekFilter,
+                            isActive: notifier.selectedFilter == TransactionFilter.thisWeek,
+                            onTap: () => notifier.setFilter(TransactionFilter.thisWeek),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          _buildFilterPill(
+                            label: AppStrings.thisMonthFilter,
+                            isActive: notifier.selectedFilter == TransactionFilter.thisMonth,
+                            onTap: () => notifier.setFilter(TransactionFilter.thisMonth),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  _buildFilterPill(
-                    label: AppStrings.thisWeekFilter,
-                    isActive: notifier.selectedFilter == TransactionFilter.thisWeek,
-                    onTap: () => notifier.setFilter(TransactionFilter.thisWeek),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  _buildFilterPill(
-                    label: AppStrings.thisMonthFilter,
-                    isActive: notifier.selectedFilter == TransactionFilter.thisMonth,
-                    onTap: () => notifier.setFilter(TransactionFilter.thisMonth),
-                  ),
-                  const Spacer(),
                   Container(
                     height: 34,
                     width: 34,
@@ -383,7 +398,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               ),
               const SizedBox(height: AppSpacing.md),
 
-              // ── Transactions List ────────────────────────────────────────
+              // ── Transactions List (With overflow protection on text) ──────
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -433,6 +448,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               children: [
                                 Text(
                                   tx.customerName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: AppTextStyles.semiBoldMedium.copyWith(
                                     color: AppColors.darkText,
                                   ),
@@ -440,6 +457,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   '${tx.rail} \u2022 ${tx.time}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: AppTextStyles.bodyXS.copyWith(
                                     color: AppColors.mutedText,
                                   ),
@@ -447,6 +466,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               ],
                             ),
                           ),
+                          const SizedBox(width: AppSpacing.sm),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
@@ -582,40 +602,44 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 const SizedBox(height: AppSpacing.lg),
               ],
 
-              // ── Footer Links ─────────────────────────────────────────────
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(
-                      AppIcons.shieldCheck,
-                      size: 14,
-                      color: AppColors.mutedText,
-                    ),
-                    label: Text(
-                      AppStrings.directBoleHub,
-                      style: AppTextStyles.bodyXXS.copyWith(
+              // ── Footer Links (Wrapped to Prevent Pixel Overflow on Small Screens) ─
+              Center(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: AppSpacing.md,
+                  runSpacing: AppSpacing.xs,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(
+                        AppIcons.shieldCheck,
+                        size: 14,
                         color: AppColors.mutedText,
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  TextButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(
-                      AppIcons.download,
-                      size: 14,
-                      color: AppColors.mutedText,
-                    ),
-                    label: Text(
-                      AppStrings.dailyStatement,
-                      style: AppTextStyles.bodyXXS.copyWith(
-                        color: AppColors.mutedText,
+                      label: Text(
+                        AppStrings.directBoleHub,
+                        style: AppTextStyles.bodyXXS.copyWith(
+                          color: AppColors.mutedText,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    TextButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(
+                        AppIcons.download,
+                        size: 14,
+                        color: AppColors.mutedText,
+                      ),
+                      label: Text(
+                        AppStrings.dailyStatement,
+                        style: AppTextStyles.bodyXXS.copyWith(
+                          color: AppColors.mutedText,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: AppSpacing.xxl),
             ],
@@ -656,6 +680,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       {bool isMono = false, bool isBold = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
@@ -663,20 +688,24 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             color: AppColors.mutedText,
           ),
         ),
-        Text(
-          value,
-          style: isMono
-              ? AppTextStyles.monoSmall.copyWith(
-                  color: AppColors.darkText,
-                  fontWeight: FontWeight.w600,
-                )
-              : (isBold
-                  ? AppTextStyles.semiBoldMedium.copyWith(
-                      color: AppColors.darkText,
-                    )
-                  : AppTextStyles.bodyXS.copyWith(
-                      color: AppColors.darkText,
-                    )),
+        const SizedBox(width: AppSpacing.md),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: isMono
+                ? AppTextStyles.monoSmall.copyWith(
+                    color: AppColors.darkText,
+                    fontWeight: FontWeight.w600,
+                  )
+                : (isBold
+                    ? AppTextStyles.semiBoldMedium.copyWith(
+                        color: AppColors.darkText,
+                      )
+                    : AppTextStyles.bodyXS.copyWith(
+                        color: AppColors.darkText,
+                      )),
+          ),
         ),
       ],
     );
