@@ -388,7 +388,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: items.length,
-                separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+                separatorBuilder: (_, index) => const SizedBox(height: AppSpacing.sm),
                 itemBuilder: (context, index) {
                   final tx = items[index];
                   final isSelected = selected?.id == tx.id;
