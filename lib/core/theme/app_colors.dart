@@ -55,5 +55,26 @@ abstract final class AppColors {
   static const Color cbePill = Color(0xFFF2A900);
   static const Color awashPill = Color(0xFF0284C7);
   static const Color dashenPill = Color(0xFF0D9488);
+
+  // ── Error / Declined palette ─────────────────────────────────────────────────
+  static const Color errorRed = Color(0xFFEF4444);
+  static const Color errorRedBg = Color(0xFFFEF2F2);   // red 10%
+  static const Color errorRedBorder = Color(0xFFFECACA); // red 20%
+
+  // ── Semantic aliases (used by widgets & screens) ─────────────────────────────
+  /// Same as [primaryGreen]. Used generically as "primary".
+  static const Color primary = primaryGreen;
+  /// Same as [primaryGreen10]. Tinted bg for primary action areas.
+  static const Color primaryBg = primaryGreen10;
+  /// Same as [darkText].
+  static const Color textDark = darkText;
+  /// Same as [mutedText].
+  static const Color textMuted = mutedText;
+  /// Same as [subtleMuted].
+  static const Color textSubtle = subtleMuted;
+  /// Same as [slatePlaceholder].
+  static const Color textPlaceholder = slatePlaceholder;
+  /// Same as [progressBarBg].
+  static const Color progressBg = progressBarBg;
 }
 
