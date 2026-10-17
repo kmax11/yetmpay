@@ -339,3 +339,4 @@ class PaymentDeclinedScreen extends StatelessWidget {
     );
   }
 }
+

@@ -7,6 +7,8 @@ import '../../core/strings/app_strings.dart';
 import '../../core/theme/theme.dart';
 import '../../core/widgets/app_card.dart';
 import '../charging/payment_notifier.dart';
+import '../terminal/terminal_notifier.dart';
+import '../transactions/transaction_notifier.dart';
 
 /// Payment Processing Screen (Figma node 3-2).
 ///
@@ -48,6 +50,25 @@ class _PaymentProcessingScreenState extends State<PaymentProcessingScreen>
         context.read<PaymentNotifier>().decline(AppStrings.faceContourFailed);
         context.go('/payment-declined');
       } else {
+        final payment = context.read<PaymentNotifier>();
+        final amount =
+            payment.numericAmount > 0 ? payment.numericAmount : 350.00;
+        final rail = payment.selectedRailName;
+        final phone = payment.recipientPhone;
+
+        payment.markSuccess();
+
+        context.read<TransactionNotifier>().recordTransaction(
+              amount: amount,
+              rail: rail,
+              customerName: 'Abebe Kebede',
+              maskedAccount:
+                  phone.isNotEmpty ? '+251 $phone' : '+251 91 ••• 8821',
+              channel: '$rail Biometric Fingerprint',
+            );
+
+        context.read<TerminalNotifier>().recordSettledSale(amount);
+
         context.go('/payment-success');
       }
     });

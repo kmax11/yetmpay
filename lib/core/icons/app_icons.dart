@@ -48,5 +48,6 @@ abstract final class AppIcons {
   static const IconData sms = Symbols.sms;
   static const IconData receipt = Symbols.receipt;
   static const IconData cancel = Symbols.cancel;
+  static const IconData clock = Symbols.schedule;
 }
 

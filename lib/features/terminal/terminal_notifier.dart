@@ -12,9 +12,15 @@ class TerminalNotifier extends ChangeNotifier {
   final String merchantInitials = 'BM';
 
   bool _isOnline = true;
-  final double _todaySettled = 14820.00;
-  final int _settledSales = 38;
+  double _todaySettled = 14820.00;
+  int _settledSales = 38;
   bool _idCopied = false;
+
+  void recordSettledSale(double amount) {
+    _todaySettled += amount;
+    _settledSales += 1;
+    notifyListeners();
+  }
 
   bool get isOnline => _isOnline;
   double get todaySettled => _todaySettled;

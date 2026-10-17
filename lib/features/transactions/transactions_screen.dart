@@ -121,6 +121,14 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               ),
                             ],
                           ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Bole Fresh Mart',
+                            style: AppTextStyles.semiBoldMedium.copyWith(
+                              color: AppColors.darkText,
+                              fontSize: 14,
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -183,20 +191,32 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   const SizedBox(width: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: 4,
+                      horizontal: AppSpacing.md,
+                      vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: AppRadius.badgeAll,
+                      color: AppColors.white,
+                      borderRadius: AppRadius.pillAll,
                       border: Border.all(color: AppColors.borderLight),
+                      boxShadow: AppShadows.cardShadow,
                     ),
-                    child: Text(
-                      AppStrings.utcLabel,
-                      style: AppTextStyles.monoSmall.copyWith(
-                        fontSize: 10,
-                        color: AppColors.mutedText,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          AppIcons.clock,
+                          size: 14,
+                          color: AppColors.mutedText,
+                        ),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          AppStrings.utcLabel,
+                          style: AppTextStyles.bodyXXS.copyWith(
+                            color: AppColors.subtleMuted,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -240,7 +260,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             runSpacing: 4,
                             children: [
                               Text(
-                                '${notifier.todaySettledVolume.toStringAsFixed(2)} ETB',
+                                '${TransactionNotifier.formatAmount(notifier.todaySettledVolume)} ETB',
                                 style: AppTextStyles.heading1.copyWith(
                                   color: AppColors.darkText,
                                   fontSize: 22,
@@ -338,7 +358,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       child: Row(
                         children: [
                           _buildFilterPill(
-                            label: '${AppStrings.todayFilter} 4',
+                            label: '${AppStrings.todayFilter} ${notifier.allTransactions.length}',
                             isActive: notifier.selectedFilter == TransactionFilter.today,
                             onTap: () => notifier.setFilter(TransactionFilter.today),
                           ),
@@ -514,39 +534,122 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
               // ── Selected Transaction Receipt ─────────────────────────────
               if (selected != null) ...[
-                Text(
-                  AppStrings.selectedReceipt,
-                  style: AppTextStyles.capsLabelSemiBold.copyWith(
-                    color: AppColors.subtleMuted,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
                 AppCard(
                   padding: const EdgeInsets.all(AppSpacing.lg),
                   child: Column(
                     children: [
-                      _buildReceiptRow('TX Ref', selected.id, isMono: true),
-                      const SizedBox(height: AppSpacing.sm),
-                      _buildReceiptRow('Customer', selected.customerName),
-                      const SizedBox(height: AppSpacing.sm),
-                      _buildReceiptRow('Account / Mobile', selected.maskedAccount),
-                      const SizedBox(height: AppSpacing.sm),
-                      _buildReceiptRow('Channel', selected.channel),
-                      const SizedBox(height: AppSpacing.sm),
-                      _buildReceiptRow('Timestamp', selected.timestamp),
-                      const SizedBox(height: AppSpacing.sm),
-                      _buildReceiptRow(
-                        'Total Amount',
-                        '${selected.amount.toStringAsFixed(2)} ETB',
-                        isBold: true,
+                      // Card Header: Icon + Title + ID Badge
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  color: AppColors.railSuccessBg,
+                                  borderRadius: AppRadius.badgeSmallAll,
+                                ),
+                                child: const Icon(
+                                  AppIcons.receipt,
+                                  color: AppColors.primaryGreen,
+                                  size: 16,
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                AppStrings.selectedReceipt,
+                                style: AppTextStyles.semiBoldMedium.copyWith(
+                                  color: AppColors.darkText,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.surface,
+                              borderRadius: AppRadius.badgeSmallAll,
+                              border: Border.all(color: AppColors.borderLight),
+                            ),
+                            child: Text(
+                              selected.id,
+                              style: AppTextStyles.monoSmall.copyWith(
+                                fontSize: 10,
+                                color: AppColors.darkText,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: AppSpacing.md),
                       const Divider(color: AppColors.divider, height: 1),
                       const SizedBox(height: AppSpacing.md),
+
+                      _buildReceiptRow('Customer', selected.customerName),
+                      const SizedBox(height: AppSpacing.sm),
+                      _buildReceiptRow('Account / Mobile', selected.maskedAccount),
+                      const SizedBox(height: AppSpacing.sm),
+                      _buildReceiptRow(
+                        'Channel',
+                        selected.channel,
+                        customWidget: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: AppColors.railGreen,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              selected.channel,
+                              style: AppTextStyles.bodyXS.copyWith(
+                                color: AppColors.darkText,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      _buildReceiptRow('Timestamp', selected.timestamp),
+                      const SizedBox(height: AppSpacing.md),
+                      const Divider(color: AppColors.divider, height: 1),
+                      const SizedBox(height: AppSpacing.md),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Total Amount',
+                            style: AppTextStyles.semiBoldMedium.copyWith(
+                              color: AppColors.darkText,
+                            ),
+                          ),
+                          Text(
+                            '${TransactionNotifier.formatAmount(selected.amount)} ETB',
+                            style: AppTextStyles.heading1.copyWith(
+                              color: AppColors.primaryGreen,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+
                       Row(
                         children: [
                           Expanded(
-                            child: OutlinedButton.icon(
+                            child: ElevatedButton.icon(
                               onPressed: () {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -555,16 +658,26 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                   ),
                                 );
                               },
-                              icon: const Icon(AppIcons.print, size: 16),
+                              icon: const Icon(
+                                AppIcons.print,
+                                size: 16,
+                                color: AppColors.white,
+                              ),
                               label: Text(
                                 AppStrings.printReceiptBtn,
-                                style: AppTextStyles.semiBoldSmall,
+                                style: AppTextStyles.semiBoldSmall.copyWith(
+                                  color: AppColors.white,
+                                ),
                               ),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColors.darkText,
-                                side: const BorderSide(color: AppColors.borderDefault),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primaryGreen,
+                                foregroundColor: AppColors.white,
+                                elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: AppRadius.buttonSmallAll,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSpacing.md,
                                 ),
                               ),
                             ),
@@ -580,16 +693,26 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                   ),
                                 );
                               },
-                              icon: const Icon(AppIcons.warning, size: 16),
+                              icon: const Icon(
+                                AppIcons.warning,
+                                size: 16,
+                                color: AppColors.darkText,
+                              ),
                               label: Text(
                                 AppStrings.reportIssue,
-                                style: AppTextStyles.semiBoldSmall,
+                                style: AppTextStyles.semiBoldSmall.copyWith(
+                                  color: AppColors.darkText,
+                                ),
                               ),
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: AppColors.subtleMuted,
+                                foregroundColor: AppColors.darkText,
+                                backgroundColor: AppColors.white,
                                 side: const BorderSide(color: AppColors.borderDefault),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: AppRadius.buttonSmallAll,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: AppSpacing.md,
                                 ),
                               ),
                             ),
@@ -677,7 +800,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   Widget _buildReceiptRow(String label, String value,
-      {bool isMono = false, bool isBold = false}) {
+      {bool isMono = false, bool isBold = false, Widget? customWidget}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -690,22 +813,23 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         ),
         const SizedBox(width: AppSpacing.md),
         Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: isMono
-                ? AppTextStyles.monoSmall.copyWith(
-                    color: AppColors.darkText,
-                    fontWeight: FontWeight.w600,
-                  )
-                : (isBold
-                    ? AppTextStyles.semiBoldMedium.copyWith(
+          child: customWidget ??
+              Text(
+                value,
+                textAlign: TextAlign.end,
+                style: isMono
+                    ? AppTextStyles.monoSmall.copyWith(
                         color: AppColors.darkText,
+                        fontWeight: FontWeight.w600,
                       )
-                    : AppTextStyles.bodyXS.copyWith(
-                        color: AppColors.darkText,
-                      )),
-          ),
+                    : (isBold
+                        ? AppTextStyles.semiBoldMedium.copyWith(
+                            color: AppColors.darkText,
+                          )
+                        : AppTextStyles.bodyXS.copyWith(
+                            color: AppColors.darkText,
+                          )),
+              ),
         ),
       ],
     );

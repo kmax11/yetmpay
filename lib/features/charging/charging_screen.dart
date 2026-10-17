@@ -394,60 +394,63 @@ class _ChargingScreenState extends State<ChargingScreen> {
             const SizedBox(height: AppSpacing.xl),
 
             // ── Today's Settled Summary Card ──────────────────────────────
-            AppCard(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: AppRadius.badgeAll,
+            GestureDetector(
+              onTap: () => context.go('/transactions'),
+              child: AppCard(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: AppRadius.badgeAll,
+                      ),
+                      child: const Icon(
+                        AppIcons.transactions,
+                        size: 20,
+                        color: AppColors.primaryGreen,
+                      ),
                     ),
-                    child: const Icon(
-                      AppIcons.transactions,
-                      size: 20,
-                      color: AppColors.primaryGreen,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Wrap(
-                          spacing: AppSpacing.xs,
-                          children: [
-                            Text(
-                              '14,820.00 ETB',
-                              style: AppTextStyles.headingSmall.copyWith(
-                                color: AppColors.darkText,
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            spacing: AppSpacing.xs,
+                            children: [
+                              Text(
+                                '${terminal.todaySettled.toStringAsFixed(2)} ETB',
+                                style: AppTextStyles.headingSmall.copyWith(
+                                  color: AppColors.darkText,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '• 38 settled sales',
-                              style: AppTextStyles.bodyXS.copyWith(
-                                color: AppColors.mutedText,
+                              Text(
+                                '• ${terminal.settledSales} settled sales',
+                                style: AppTextStyles.bodyXS.copyWith(
+                                  color: AppColors.mutedText,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          AppStrings.autoPayoutNote,
-                          style: AppTextStyles.bodyXXS.copyWith(
-                            color: AppColors.mutedText,
+                            ],
                           ),
-                        ),
-                      ],
+                          Text(
+                            AppStrings.autoPayoutNote,
+                            style: AppTextStyles.bodyXXS.copyWith(
+                              color: AppColors.mutedText,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const Icon(
-                    AppIcons.chevronRight,
-                    size: 18,
-                    color: AppColors.slatePlaceholder,
-                  ),
-                ],
+                    const Icon(
+                      AppIcons.chevronRight,
+                      size: 18,
+                      color: AppColors.slatePlaceholder,
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.xxxl),

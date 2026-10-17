@@ -25,6 +25,22 @@ class PaymentNotifier extends ChangeNotifier {
   String? get declineReason => _declineReason;
   String get recipientPhone => _recipientPhone;
 
+  static const List<String> railNames = [
+    'Telebirr SuperApp',
+    'CBE Birr',
+    'Awash Bank',
+    'Amole',
+  ];
+
+  String get selectedRailName {
+    if (_selectedRailIndex >= 0 && _selectedRailIndex < railNames.length) {
+      return railNames[_selectedRailIndex];
+    }
+    return 'Telebirr SuperApp';
+  }
+
+  double get numericAmount => double.tryParse(_amount) ?? 0.0;
+
   void updateRecipientPhone(String v) {
     _recipientPhone = v;
     notifyListeners();

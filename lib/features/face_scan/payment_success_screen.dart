@@ -10,6 +10,7 @@ import '../../core/widgets/app_outlined_button.dart';
 import '../../core/widgets/app_primary_button.dart';
 import '../../core/widgets/app_text_link_button.dart';
 import '../charging/payment_notifier.dart';
+import '../transactions/transaction_notifier.dart';
 
 /// Payment Success Screen (Figma node 3-79).
 ///
@@ -21,7 +22,20 @@ class PaymentSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final payment = context.watch<PaymentNotifier>();
-    const transactionRef = 'TXN-894120938-ET';
+    final txNotifier = context.watch<TransactionNotifier>();
+    final tx = txNotifier.selectedTransaction;
+
+    final transactionRef = tx?.id ?? 'TX-984321-ET';
+    final customerName = tx?.customerName ?? 'Abebe K.';
+    final railName = tx?.rail ??
+        (payment.selectedRailName.isNotEmpty
+            ? payment.selectedRailName
+            : 'Telebirr SuperApp');
+    final displayAmount = payment.numericAmount > 0
+        ? payment.displayAmount
+        : (tx != null ? TransactionNotifier.formatAmount(tx.amount) : '350.00');
+    final formattedTime =
+        tx?.time != null ? 'Today, ${tx!.time}' : 'Today, 2:45 PM';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -115,7 +129,7 @@ class PaymentSuccessScreen extends StatelessWidget {
 
               // ── Amount & Status ──────────────────────────────────────────
               Text(
-                '${payment.displayAmount} ETB',
+                '$displayAmount ETB',
                 style: AppTextStyles.displayLarge.copyWith(
                   color: AppColors.darkText,
                   fontSize: 38,
@@ -172,7 +186,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'Abebe K.',
+                            customerName,
                             style: AppTextStyles.semiBoldMedium.copyWith(
                               color: AppColors.darkText,
                             ),
@@ -219,27 +233,10 @@ class PaymentSuccessScreen extends StatelessWidget {
                       valueWidget: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Container(
-                            width: 18,
-                            height: 18,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF0072BC),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Center(
-                              child: Text(
-                                'tb',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
+                          _buildRailBadge(railName),
                           const SizedBox(width: AppSpacing.xs),
                           Text(
-                            'Telebirr SuperApp',
+                            railName,
                             style: AppTextStyles.semiBoldMedium.copyWith(
                               color: AppColors.darkText,
                             ),
@@ -263,7 +260,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                     _buildDetailRow(
                       label: 'Time',
                       valueWidget: Text(
-                        'Today, 2:45 PM',
+                        formattedTime,
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.darkText,
                         ),
@@ -288,7 +285,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                           onTap: () {
                             Clipboard.setData(
-                              const ClipboardData(text: transactionRef),
+                              ClipboardData(text: transactionRef),
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -361,6 +358,16 @@ class PaymentSuccessScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
 
               AppOutlinedButton(
+                label: 'View in Transactions',
+                leadingIcon: AppIcons.transactions,
+                onPressed: () {
+                  payment.reset();
+                  context.go('/transactions');
+                },
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              AppOutlinedButton(
                 label: AppStrings.sendReceipt,
                 leadingIcon: AppIcons.sms,
                 onPressed: () {
@@ -389,6 +396,42 @@ class PaymentSuccessScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildRailBadge(String rail) {
+    final lower = rail.toLowerCase();
+    Color bgColor = const Color(0xFF0072BC);
+    String text = 'tb';
+
+    if (lower.contains('cbe')) {
+      bgColor = AppColors.cbeBadgeBg;
+      text = 'CBE';
+    } else if (lower.contains('awash')) {
+      bgColor = AppColors.awashBadgeBg;
+      text = 'AW';
+    } else if (lower.contains('dashen') || lower.contains('amole')) {
+      bgColor = AppColors.dashenBadgeBg;
+      text = 'DA';
+    }
+
+    return Container(
+      width: 18,
+      height: 18,
+      decoration: BoxDecoration(
+        color: bgColor,
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 8,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDetailRow({
     required String label,
     required Widget valueWidget,
@@ -407,3 +450,4 @@ class PaymentSuccessScreen extends StatelessWidget {
     );
   }
 }
+
