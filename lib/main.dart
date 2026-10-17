@@ -5,6 +5,7 @@ import 'features/auth/auth_notifier.dart';
 import 'features/charging/payment_notifier.dart';
 import 'features/registration/registration_notifier.dart';
 import 'features/terminal/terminal_notifier.dart';
+import 'features/transactions/transaction_notifier.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => RegistrationNotifier()),
         ChangeNotifierProvider(create: (_) => TerminalNotifier()),
         ChangeNotifierProvider(create: (_) => PaymentNotifier()),
+        ChangeNotifierProvider(create: (_) => TransactionNotifier()),
       ],
       child: const App(),
     ),
