@@ -102,6 +102,11 @@ abstract final class AppStrings {
   static const biometricPrivacy =
       'Biometric data is processed locally and never stored';
   static const cancelSale = 'Cancel sale';
+  static const noFaceRecognized = 'No Face Recognized';
+  static const noFaceSub =
+      'Face not detected in frame. Switching to fingerprint biometric scanner.';
+  static const continueWithFingerprint = 'Continue with Fingerprint';
+  static const retryScan = 'Retry Face Scan';
 
   // ── Login ─────────────────────────────────────────────────────────────────
   static const loginTitle = 'Merchant Login';

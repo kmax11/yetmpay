@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +6,8 @@ import 'package:provider/provider.dart';
 import '../../core/icons/app_icons.dart';
 import '../../core/strings/app_strings.dart';
 import '../../core/theme/theme.dart';
+import '../../core/widgets/app_outlined_button.dart';
+import '../../core/widgets/app_primary_button.dart';
 import '../../core/widgets/app_progress_bar.dart';
 import '../../core/widgets/app_scan_viewport.dart';
 import '../../core/widgets/app_text_link_button.dart';
@@ -15,6 +18,9 @@ import '../charging/payment_notifier.dart';
 /// Top-level route that covers the shell bottom navigation bar.
 /// Uses the device camera if available with corner brackets, oval face ring,
 /// animated laser line, and simulated biometric verification lifecycle.
+///
+/// If no face is recognized, displays an error image/state and provides
+/// seamless fallback to the fingerprint authorization screen.
 class FaceScanScreen extends StatefulWidget {
   const FaceScanScreen({super.key});
 
@@ -27,6 +33,9 @@ class _FaceScanScreenState extends State<FaceScanScreen>
   CameraController? _cameraController;
   late final AnimationController _progressController;
   late final Animation<double> _progressAnimation;
+
+  bool _hasNoFace = false;
+  Timer? _autoFingerprintTimer;
 
   @override
   void initState() {
@@ -44,12 +53,12 @@ class _FaceScanScreenState extends State<FaceScanScreen>
         setState(() {});
       })
       ..addStatusListener((status) {
-        if (status == AnimationStatus.completed && mounted) {
+        if (status == AnimationStatus.completed && mounted && !_hasNoFace) {
           _handleVerificationComplete();
         }
       });
 
-    // Start verification
+    // Start face scan
     _progressController.forward();
   }
 
@@ -84,8 +93,33 @@ class _FaceScanScreenState extends State<FaceScanScreen>
     context.pushReplacement('/payment-success');
   }
 
+  void _triggerNoFaceError() {
+    _progressController.stop();
+    setState(() {
+      _hasNoFace = true;
+    });
+
+    // Auto-navigate to fingerprint page after 3.5 seconds if user does not click earlier
+    _autoFingerprintTimer?.cancel();
+    _autoFingerprintTimer = Timer(const Duration(milliseconds: 3500), () {
+      if (mounted && _hasNoFace) {
+        context.pushReplacement('/payment-processing');
+      }
+    });
+  }
+
+  void _retryScan() {
+    _autoFingerprintTimer?.cancel();
+    setState(() {
+      _hasNoFace = false;
+    });
+    _progressController.reset();
+    _progressController.forward();
+  }
+
   @override
   void dispose() {
+    _autoFingerprintTimer?.cancel();
     _cameraController?.dispose();
     _progressController.dispose();
     super.dispose();
@@ -124,106 +158,180 @@ class _FaceScanScreenState extends State<FaceScanScreen>
                       color: AppColors.darkText,
                     ),
                   ),
-                  const SizedBox(width: 48), // Balancing spacer
+                  // Test Trigger / Simulation button
+                  GestureDetector(
+                    onTap: _hasNoFace ? _retryScan : _triggerNoFaceError,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _hasNoFace
+                            ? AppColors.railSuccessBg
+                            : AppColors.errorRedBg,
+                        borderRadius: AppRadius.pillAll,
+                        border: Border.all(
+                          color: _hasNoFace
+                              ? AppColors.railGreen
+                              : AppColors.errorRedBorder,
+                        ),
+                      ),
+                      child: Text(
+                        _hasNoFace ? 'Retry' : 'No Face?',
+                        style: AppTextStyles.semiBoldBadge.copyWith(
+                          color: _hasNoFace
+                              ? AppColors.railSuccessText
+                              : AppColors.errorRed,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.lg),
 
-              // ── Dark Viewport with Camera & Laser ─────────────────────────
+              // ── Dark Viewport with Camera & Laser / Error Visual ──────────
               Center(
                 child: AppScanViewport(
                   cameraController: _cameraController,
+                  hasError: _hasNoFace,
                 ),
-              ),
-              const SizedBox(height: AppSpacing.xxl),
-
-              // ── Guidance Message ──────────────────────────────────────────
-              Text(
-                AppStrings.positionFace,
-                style: AppTextStyles.semiBoldLarge.copyWith(
-                  color: AppColors.darkText,
-                ),
-                textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // ── Auto-verifying Progress Bar ───────────────────────────────
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.xl,
+              // ── Dynamic Guidance Message or Error Title ──────────────────
+              if (_hasNoFace) ...[
+                Text(
+                  AppStrings.noFaceRecognized,
+                  style: AppTextStyles.heading2.copyWith(
+                    color: AppColors.errorRed,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: AppColors.scanLive,
-                                shape: BoxShape.circle,
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  AppStrings.noFaceSub,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.mutedText,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ] else ...[
+                Text(
+                  AppStrings.positionFace,
+                  style: AppTextStyles.semiBoldLarge.copyWith(
+                    color: AppColors.darkText,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+              const SizedBox(height: AppSpacing.lg),
+
+              // ── Progress Bar (Scanning Mode) or Action Buttons (Error Mode) ─
+              if (!_hasNoFace)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xl,
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.scanLive,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(
-                              AppStrings.autoVerifying,
-                              style: AppTextStyles.labelMedium.copyWith(
-                                color: AppColors.subtleMuted,
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                AppStrings.autoVerifying,
+                                style: AppTextStyles.labelMedium.copyWith(
+                                  color: AppColors.subtleMuted,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          '$percent%',
-                          style: AppTextStyles.monoSmall.copyWith(
-                            color: AppColors.darkText,
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    AppProgressBar(value: _progressAnimation.value),
-                  ],
+                          Text(
+                            '$percent%',
+                            style: AppTextStyles.monoSmall.copyWith(
+                              color: AppColors.darkText,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      AppProgressBar(value: _progressAnimation.value),
+                    ],
+                  ),
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
+                  child: Column(
+                    children: [
+                      AppPrimaryButton(
+                        label: AppStrings.continueWithFingerprint,
+                        leadingIcon: AppIcons.fingerprint,
+                        onPressed: () {
+                          _autoFingerprintTimer?.cancel();
+                          context.pushReplacement('/payment-processing');
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      AppOutlinedButton(
+                        label: AppStrings.retryScan,
+                        leadingIcon: AppIcons.refresh,
+                        onPressed: _retryScan,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
               const Spacer(),
 
-              // ── Switch to Fingerprint Button ──────────────────────────────
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: AppRadius.pillAll,
-                  border: Border.all(color: AppColors.borderDefault),
-                  boxShadow: AppShadows.cardShadow,
-                ),
-                child: TextButton.icon(
-                  onPressed: () {
-                    context.pushReplacement('/payment-processing');
-                  },
-                  icon: const Icon(
-                    AppIcons.fingerprint,
-                    size: 20,
-                    color: AppColors.subtleMuted,
+              // ── Bottom Action / Privacy ──────────────────────────────────
+              if (!_hasNoFace)
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: AppRadius.pillAll,
+                    border: Border.all(color: AppColors.borderDefault),
+                    boxShadow: AppShadows.cardShadow,
                   ),
-                  label: Text(
-                    AppStrings.switchToFingerprint,
-                    style: AppTextStyles.semiBoldSmall.copyWith(
-                      color: AppColors.darkText,
+                  child: TextButton.icon(
+                    onPressed: () {
+                      context.pushReplacement('/payment-processing');
+                    },
+                    icon: const Icon(
+                      AppIcons.fingerprint,
+                      size: 20,
+                      color: AppColors.subtleMuted,
+                    ),
+                    label: Text(
+                      AppStrings.switchToFingerprint,
+                      style: AppTextStyles.semiBoldSmall.copyWith(
+                        color: AppColors.darkText,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                        vertical: AppSpacing.md,
+                      ),
                     ),
                   ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xl,
-                      vertical: AppSpacing.md,
-                    ),
-                  ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.md),
 
               // ── Privacy Notice ────────────────────────────────────────────
               Row(
@@ -243,7 +351,7 @@ class _FaceScanScreenState extends State<FaceScanScreen>
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: AppSpacing.xs),
 
               // ── Cancel Sale Button ────────────────────────────────────────
               AppTextLinkButton(
@@ -252,11 +360,12 @@ class _FaceScanScreenState extends State<FaceScanScreen>
                   color: AppColors.mutedText,
                 ),
                 onPressed: () {
+                  _autoFingerprintTimer?.cancel();
                   payment.reset();
                   Navigator.of(context).pop();
                 },
               ),
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.sm),
             ],
           ),
         ),

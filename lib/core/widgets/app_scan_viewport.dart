@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import '../theme/theme.dart';
+import '../icons/app_icons.dart';
 import '../strings/app_strings.dart';
+import '../theme/theme.dart';
 
 /// Dark face-scan viewport with camera preview, corner brackets,
 /// oval scan ring, animated laser line, and LIVE indicator.
@@ -9,9 +10,14 @@ import '../strings/app_strings.dart';
 /// Pass [cameraController] when camera permission is granted; otherwise a
 /// dark placeholder is shown.
 class AppScanViewport extends StatefulWidget {
-  const AppScanViewport({super.key, this.cameraController});
+  const AppScanViewport({
+    super.key,
+    this.cameraController,
+    this.hasError = false,
+  });
 
   final CameraController? cameraController;
+  final bool hasError;
 
   @override
   State<AppScanViewport> createState() => _AppScanViewportState();
@@ -90,7 +96,7 @@ class _AppScanViewportState extends State<AppScanViewport>
           // Corner brackets.
           ..._corners(),
 
-          // Oval scan ring + laser.
+          // Oval scan ring + laser / error graphic.
           Center(
             child: SizedBox(
               width: 188,
@@ -104,45 +110,102 @@ class _AppScanViewportState extends State<AppScanViewport>
                         borderRadius:
                             BorderRadius.circular(AppRadius.ovalScan),
                         border: Border.all(
-                          color: const Color(0x6610B981),
+                          color: widget.hasError
+                              ? AppColors.errorRed.withValues(alpha: 0.7)
+                              : const Color(0x6610B981),
+                          width: widget.hasError ? 2 : 1,
                         ),
                       ),
                     ),
                   ),
-                  // Animated laser.
-                  AnimatedBuilder(
-                    animation: _laserY,
-                    builder: (context, child) => Positioned(
-                      left: 0,
-                      right: 0,
-                      top: _laserY.value * 236 - 1,
-                      child: Container(
-                        height: 2,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              Color(0x0010B981),
-                              Color(0xFF10B981),
-                              Color(0x0010B981),
+                  // Animated laser or Error Graphic.
+                  if (widget.hasError)
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: AppColors.errorRedBg,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.errorRed,
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.errorRed.withValues(alpha: 0.3),
+                                  blurRadius: 16,
+                                  spreadRadius: 2,
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                AppIcons.warning,
+                                color: AppColors.errorRed,
+                                size: 38,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.errorRed,
+                              borderRadius: AppRadius.pillAll,
+                            ),
+                            child: Text(
+                              'NO FACE',
+                              style: AppTextStyles.semiBoldBadge.copyWith(
+                                color: AppColors.white,
+                                fontSize: 9,
+                                letterSpacing: 0.8,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    AnimatedBuilder(
+                      animation: _laserY,
+                      builder: (context, child) => Positioned(
+                        left: 0,
+                        right: 0,
+                        top: _laserY.value * 236 - 1,
+                        child: Container(
+                          height: 2,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0x0010B981),
+                                Color(0xFF10B981),
+                                Color(0x0010B981),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF10B981),
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                              ),
                             ],
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF10B981),
-                              blurRadius: 10,
-                              spreadRadius: 1,
-                            ),
-                          ],
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
           ),
 
-          // LIVE indicator top-left.
+          // Status indicator top-left.
           Positioned(
             left: 16,
             top: 12,
@@ -153,16 +216,20 @@ class _AppScanViewportState extends State<AppScanViewport>
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: const BoxDecoration(
-                      color: AppColors.scanLive,
+                    decoration: BoxDecoration(
+                      color: widget.hasError
+                          ? AppColors.errorRed
+                          : AppColors.scanLive,
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    AppStrings.liveLabel,
+                    widget.hasError ? 'ERROR' : AppStrings.liveLabel,
                     style: AppTextStyles.monoLIVE.copyWith(
-                      color: AppColors.scanLiveText,
+                      color: widget.hasError
+                          ? AppColors.errorRed
+                          : AppColors.scanLiveText,
                     ),
                   ),
                 ],
@@ -177,7 +244,7 @@ class _AppScanViewportState extends State<AppScanViewport>
   List<Widget> _corners() {
     const size = 24.0;
     const strokeW = 2.0;
-    const color = AppColors.scanLive;
+    final color = widget.hasError ? AppColors.errorRed : AppColors.scanLive;
     const r = AppRadius.bracket;
     return [
       Positioned(
