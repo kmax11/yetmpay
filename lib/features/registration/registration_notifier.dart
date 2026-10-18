@@ -18,6 +18,7 @@ class RegistrationNotifier extends ChangeNotifier {
   // ── Step 2 — Settlement account ────────────────────────────────────────────
   SettlementType settlementType = SettlementType.telebirr;
   int selectedBankIndex = 0; // 0=CBE, 1=Awash, 2=Dashen, 3=BoA
+  int selectedTabIndex = 0;  // 0=Bank Account, 1=Telebirr SuperApp (link_bank_screen)
   String accountNumber = '';
   String linkedMobile = '';
 
@@ -44,6 +45,7 @@ class RegistrationNotifier extends ChangeNotifier {
   void updateTin(String v) { tin = v; notifyListeners(); }
   void updateBusinessLicense(String v) { businessLicense = v; notifyListeners(); }
   void updateSettlementType(SettlementType t) { settlementType = t; notifyListeners(); }
+  void updateTabIndex(int i) { selectedTabIndex = i; notifyListeners(); }
   void updateBankIndex(int i) { selectedBankIndex = i; notifyListeners(); }
   void updateAccountNumber(String v) { accountNumber = v; notifyListeners(); }
   void updateLinkedMobile(String v) { linkedMobile = v; notifyListeners(); }
