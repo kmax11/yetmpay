@@ -209,13 +209,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           color: AppColors.mutedText,
                         ),
                         const SizedBox(width: AppSpacing.xs),
-                        Text(
-                          AppStrings.utcLabel,
-                          style: AppTextStyles.bodyXXS.copyWith(
-                            color: AppColors.subtleMuted,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        // Text(
+                        //   AppStrings.utcLabel,
+                        //   style: AppTextStyles.bodyXXS.copyWith(
+                        //     color: AppColors.subtleMuted,
+                        //     fontWeight: FontWeight.w500,
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),

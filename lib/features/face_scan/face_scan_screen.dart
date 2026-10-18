@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -38,15 +39,30 @@ class _FaceScanScreenState extends State<FaceScanScreen>
 
   bool _hasNoFace = false;
   Timer? _autoFingerprintTimer;
+  Timer? _phaseTimer;
+  String _scanPhase = 'Initializing camera…';
+
+  // Realistic scanning phases shown sequentially during the scan
+  static const _phases = [
+    'Initializing camera…',
+    'Detecting face position…',
+    'Analyzing facial geometry…',
+    'Matching biometric template…',
+    'Verifying identity…',
+    'Confirming with Fayda ID…',
+  ];
 
   @override
   void initState() {
     super.initState();
     _initCamera();
 
+    // Randomize scan duration: 3–5 seconds
+    final scanMs = 3000 + math.Random().nextInt(2001);
+
     _progressController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 3),
+      duration: Duration(milliseconds: scanMs),
     );
 
     _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -56,12 +72,24 @@ class _FaceScanScreenState extends State<FaceScanScreen>
       })
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed && mounted && !_hasNoFace) {
+          _phaseTimer?.cancel();
           _handleVerificationComplete();
         }
       });
 
-    // Start face scan
+    _startPhaseLabels(scanMs);
     _progressController.forward();
+  }
+
+  void _startPhaseLabels(int totalMs) {
+    final stepMs = totalMs ~/ _phases.length;
+    for (int i = 0; i < _phases.length; i++) {
+      Future.delayed(Duration(milliseconds: stepMs * i), () {
+        if (mounted && !_hasNoFace) {
+          setState(() => _scanPhase = _phases[i]);
+        }
+      });
+    }
   }
 
   Future<void> _initCamera() async {
@@ -114,14 +142,17 @@ class _FaceScanScreenState extends State<FaceScanScreen>
   }
 
   void _triggerNoFaceError() {
+    _phaseTimer?.cancel();
     _progressController.stop();
     setState(() {
       _hasNoFace = true;
+      _scanPhase = 'No face detected';
     });
 
-    // Auto-navigate to fingerprint page after 3.5 seconds if user does not click earlier
+    // Auto-redirect to fingerprint: 4–6 seconds
+    final redirectMs = 4000 + math.Random().nextInt(2001);
     _autoFingerprintTimer?.cancel();
-    _autoFingerprintTimer = Timer(const Duration(milliseconds: 3500), () {
+    _autoFingerprintTimer = Timer(Duration(milliseconds: redirectMs), () {
       if (mounted && _hasNoFace) {
         context.pushReplacement('/payment-processing');
       }
@@ -132,14 +163,19 @@ class _FaceScanScreenState extends State<FaceScanScreen>
     _autoFingerprintTimer?.cancel();
     setState(() {
       _hasNoFace = false;
+      _scanPhase = 'Initializing camera…';
     });
     _progressController.reset();
+    final scanMs = 3000 + math.Random().nextInt(2001);
+    _progressController.duration = Duration(milliseconds: scanMs);
+    _startPhaseLabels(scanMs);
     _progressController.forward();
   }
 
   @override
   void dispose() {
     _autoFingerprintTimer?.cancel();
+    _phaseTimer?.cancel();
     _cameraController?.dispose();
     _progressController.dispose();
     super.dispose();
@@ -272,7 +308,7 @@ class _FaceScanScreenState extends State<FaceScanScreen>
                               ),
                               const SizedBox(width: AppSpacing.sm),
                               Text(
-                                AppStrings.autoVerifying,
+                                _scanPhase,
                                 style: AppTextStyles.labelMedium.copyWith(
                                   color: AppColors.subtleMuted,
                                 ),
