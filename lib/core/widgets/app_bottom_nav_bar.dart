@@ -40,13 +40,13 @@ class AppBottomNavBar extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: AppColors.errorRedBg,
+                color: AppColors.primaryGreen10,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
-                AppIcons.close,
-                color: AppColors.errorRed,
-                size: 28,
+                AppIcons.logout,
+                color: AppColors.primaryGreen,
+                size: 26,
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
