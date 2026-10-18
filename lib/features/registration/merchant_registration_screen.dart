@@ -31,6 +31,7 @@ class _MerchantRegistrationScreenState
   // Settlement
   late final TextEditingController _mobileController;
   late final TextEditingController _accountController;
+  bool _submitted = false;
 
   @override
   void initState() {
@@ -69,13 +70,15 @@ class _MerchantRegistrationScreenState
 
     final success = await reg.submitStep1();
     if (success && mounted) {
-      context.push('/register/link-bank');
+      setState(() => _submitted = true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final reg = context.watch<RegistrationNotifier>();
+
+    if (_submitted) return _buildSuccessView();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -349,6 +352,103 @@ class _MerchantRegistrationScreenState
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSuccessView() {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.screenPadH,
+            vertical: AppSpacing.xl,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Spacer(),
+
+              // ── Icon ──────────────────────────────────────────────────────
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.railSuccessBg,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.railGreen.withValues(alpha: 0.3),
+                    width: 2,
+                  ),
+                ),
+                child: const Center(
+                  child: Icon(
+                    AppIcons.checkCircle,
+                    color: AppColors.railSuccessText,
+                    size: 40,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xxl),
+
+              // ── Headline ─────────────────────────────────────────────────
+              Text(
+                'Application Submitted!',
+                style: AppTextStyles.heading1.copyWith(color: AppColors.darkText),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                "We'll review your details and reach out\nwithin 1–2 business days to activate\nyour terminal.",
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.mutedText,
+                  height: 1.6,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.xxxl),
+
+              // ── Info Card ─────────────────────────────────────────────────
+              AppCard(
+                child: Column(
+                  children: [
+                    _infoRow(AppIcons.mobile, 'Via SMS & call to your registered number'),
+                    const Divider(color: AppColors.divider, height: AppSpacing.xl),
+                    _infoRow(AppIcons.shieldCheck, 'NBE-compliant identity & TIN verification'),
+                    const Divider(color: AppColors.divider, height: AppSpacing.xl),
+                    _infoRow(AppIcons.lightning, 'Terminal activated within 48 hours'),
+                  ],
+                ),
+              ),
+
+              const Spacer(),
+
+              // ── CTA ───────────────────────────────────────────────────────
+              AppPrimaryButton(
+                label: 'Back to Home',
+                trailingIcon: AppIcons.arrowRight,
+                onPressed: () => context.go('/'),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _infoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: AppColors.primaryGreen),
+        const SizedBox(width: AppSpacing.lg),
+        Expanded(
+          child: Text(
+            text,
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.bodyText),
+          ),
+        ),
+      ],
     );
   }
 
