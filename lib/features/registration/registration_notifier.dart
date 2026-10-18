@@ -3,18 +3,21 @@ import 'package:flutter/foundation.dart';
 /// Registration flow status.
 enum RegistrationStatus { idle, loading, success, error }
 
-/// Two-step registration form state:
-/// Step 1 — merchant details, Step 2 — bank account linking.
+/// Settlement type for the registration form.
+enum SettlementType { telebirr, bank }
+
+/// Two-step registration form state.
 class RegistrationNotifier extends ChangeNotifier {
   // ── Step 1 — Merchant details ──────────────────────────────────────────────
   String businessName = '';
   String ownerName = '';
   String phone = '';
-  String pin = '';
+  String tin = '';
+  String businessLicense = '';
 
-  // ── Step 2 — Bank linking ──────────────────────────────────────────────────
+  // ── Step 2 — Settlement account ────────────────────────────────────────────
+  SettlementType settlementType = SettlementType.telebirr;
   int selectedBankIndex = 0; // 0=CBE, 1=Awash, 2=Dashen, 3=BoA
-  int selectedTabIndex = 0; // 0=Bank Account, 1=Telebirr SuperApp
   String accountNumber = '';
   String linkedMobile = '';
 
@@ -28,50 +31,22 @@ class RegistrationNotifier extends ChangeNotifier {
       businessName.trim().isNotEmpty &&
       ownerName.trim().isNotEmpty &&
       phone.trim().length >= 9 &&
-      pin.trim().length >= 4;
+      tin.trim().length >= 8 &&
+      businessLicense.trim().isNotEmpty;
 
-  bool get step2Valid =>
-      accountNumber.trim().length == 13 && linkedMobile.trim().isNotEmpty;
+  bool get step2Valid => settlementType == SettlementType.telebirr
+      ? linkedMobile.trim().length >= 9
+      : accountNumber.trim().length >= 10 && linkedMobile.trim().length >= 9;
 
-  void updateBusinessName(String v) {
-    businessName = v;
-    notifyListeners();
-  }
-
-  void updateOwnerName(String v) {
-    ownerName = v;
-    notifyListeners();
-  }
-
-  void updatePhone(String v) {
-    phone = v;
-    notifyListeners();
-  }
-
-  void updatePin(String v) {
-    pin = v;
-    notifyListeners();
-  }
-
-  void updateBankIndex(int i) {
-    selectedBankIndex = i;
-    notifyListeners();
-  }
-
-  void updateTabIndex(int i) {
-    selectedTabIndex = i;
-    notifyListeners();
-  }
-
-  void updateAccountNumber(String v) {
-    accountNumber = v;
-    notifyListeners();
-  }
-
-  void updateLinkedMobile(String v) {
-    linkedMobile = v;
-    notifyListeners();
-  }
+  void updateBusinessName(String v) { businessName = v; notifyListeners(); }
+  void updateOwnerName(String v) { ownerName = v; notifyListeners(); }
+  void updatePhone(String v) { phone = v; notifyListeners(); }
+  void updateTin(String v) { tin = v; notifyListeners(); }
+  void updateBusinessLicense(String v) { businessLicense = v; notifyListeners(); }
+  void updateSettlementType(SettlementType t) { settlementType = t; notifyListeners(); }
+  void updateBankIndex(int i) { selectedBankIndex = i; notifyListeners(); }
+  void updateAccountNumber(String v) { accountNumber = v; notifyListeners(); }
+  void updateLinkedMobile(String v) { linkedMobile = v; notifyListeners(); }
 
   Future<bool> submitStep1() async {
     if (!step1Valid) return false;
@@ -93,4 +68,3 @@ class RegistrationNotifier extends ChangeNotifier {
     return true;
   }
 }
-
