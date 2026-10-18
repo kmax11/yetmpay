@@ -170,6 +170,8 @@ abstract final class AppStrings {
   static const realtimeActivity = 'Real-time payment activity and settlement';
   static const utcLabel = 'UTC+3 (Addis Ababa)';
   static const todaySettledVolume = "TODAY'S SETTLED VOLUME";
+  static const weekSettledVolume = "THIS WEEK'S SETTLED VOLUME";
+  static const monthSettledVolume = "THIS MONTH'S SETTLED VOLUME";
   static const syncedLabel = 'Synced';
   static const autoClears = 'Auto-clears at 00:00';
   static const searchPlaceholder = 'Search by customer name or ref #';

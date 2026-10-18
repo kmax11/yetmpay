@@ -247,7 +247,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            AppStrings.todaySettledVolume,
+                            notifier.selectedFilter == TransactionFilter.today
+                                ? AppStrings.todaySettledVolume
+                                : notifier.selectedFilter == TransactionFilter.thisWeek
+                                    ? AppStrings.weekSettledVolume
+                                    : AppStrings.monthSettledVolume,
                             style: AppTextStyles.capsLabel.copyWith(
                               color: AppColors.mutedText,
                               fontSize: 10,
@@ -260,7 +264,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             runSpacing: 4,
                             children: [
                               Text(
-                                '${TransactionNotifier.formatAmount(notifier.todaySettledVolume)} ETB',
+                                '${TransactionNotifier.formatAmount(notifier.settledVolumeForFilter)} ETB',
                                 style: AppTextStyles.heading1.copyWith(
                                   color: AppColors.darkText,
                                   fontSize: 22,
@@ -358,19 +362,19 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       child: Row(
                         children: [
                           _buildFilterPill(
-                            label: '${AppStrings.todayFilter} ${notifier.allTransactions.length}',
+                            label: '${AppStrings.todayFilter} ${notifier.todayCount}',
                             isActive: notifier.selectedFilter == TransactionFilter.today,
                             onTap: () => notifier.setFilter(TransactionFilter.today),
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           _buildFilterPill(
-                            label: AppStrings.thisWeekFilter,
+                            label: '${AppStrings.thisWeekFilter} ${notifier.thisWeekCount}',
                             isActive: notifier.selectedFilter == TransactionFilter.thisWeek,
                             onTap: () => notifier.setFilter(TransactionFilter.thisWeek),
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           _buildFilterPill(
-                            label: AppStrings.thisMonthFilter,
+                            label: '${AppStrings.thisMonthFilter} ${notifier.thisMonthCount}',
                             isActive: notifier.selectedFilter == TransactionFilter.thisMonth,
                             onTap: () => notifier.setFilter(TransactionFilter.thisMonth),
                           ),
