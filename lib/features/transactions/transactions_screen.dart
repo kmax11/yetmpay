@@ -203,12 +203,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          AppIcons.clock,
-                          size: 14,
-                          color: AppColors.mutedText,
-                        ),
-                        const SizedBox(width: AppSpacing.xs),
+                        // const Icon(
+                        //   AppIcons.clock,
+                        //   size: 14,
+                        //   color: AppColors.mutedText,
+                        // ),
+                        // const SizedBox(width: AppSpacing.xs),
                         // Text(
                         //   AppStrings.utcLabel,
                         //   style: AppTextStyles.bodyXXS.copyWith(

@@ -40,9 +40,10 @@ class _FaceScanScreenState extends State<FaceScanScreen>
   bool _hasNoFace = false;
   Timer? _autoFingerprintTimer;
   Timer? _phaseTimer;
+  Timer? _failureTimer;
   String _scanPhase = 'Initializing camera…';
 
-  // Realistic scanning phases shown sequentially during the scan
+  // Realistic scanning phases
   static const _phases = [
     'Initializing camera…',
     'Detecting face position…',
@@ -57,27 +58,57 @@ class _FaceScanScreenState extends State<FaceScanScreen>
     super.initState();
     _initCamera();
 
-    // Randomize scan duration: 3–5 seconds
-    final scanMs = 3000 + math.Random().nextInt(2001);
-
-    _progressController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: scanMs),
-    );
-
+    // Controller created here; _startScan sets its duration each time
+    _progressController = AnimationController(vsync: this, duration: const Duration(seconds: 8));
     _progressAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _progressController, curve: Curves.easeInOut),
-    )..addListener(() {
-        setState(() {});
-      })
+    )..addListener(() => setState(() {}))
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed && mounted && !_hasNoFace) {
           _phaseTimer?.cancel();
+          _failureTimer?.cancel();
           _handleVerificationComplete();
         }
       });
 
+    _startScan();
+  }
+
+  void _startScan() {
+    final rng = math.Random();
+
+    // Scan duration: 7–10 seconds for realism
+    final scanMs = 7000 + rng.nextInt(3001);
+    _progressController.duration = Duration(milliseconds: scanMs);
+
     _startPhaseLabels(scanMs);
+
+    // 40% chance: fail mid-scan at 60–80% of total duration
+    final willFail = rng.nextDouble() < 0.40;
+    if (willFail) {
+      final failAt = (scanMs * (0.60 + rng.nextDouble() * 0.20)).toInt();
+      _failureTimer = Timer(Duration(milliseconds: failAt), () {
+        if (mounted && !_hasNoFace) {
+          _triggerNoFaceError();
+        }
+      });
+    }
+
+    // Realistic stutter: pause at ~65% to simulate deep processing
+    final stutterAt = (scanMs * 0.65).toInt();
+    final stutterDuration = 800 + rng.nextInt(700);
+    Future.delayed(Duration(milliseconds: stutterAt), () {
+      if (mounted && !_hasNoFace && _progressController.isAnimating) {
+        _progressController.stop();
+        setState(() => _scanPhase = 'Processing biometric data…');
+        Future.delayed(Duration(milliseconds: stutterDuration), () {
+          if (mounted && !_hasNoFace) {
+            _progressController.forward();
+          }
+        });
+      }
+    });
+
     _progressController.forward();
   }
 
@@ -143,14 +174,15 @@ class _FaceScanScreenState extends State<FaceScanScreen>
 
   void _triggerNoFaceError() {
     _phaseTimer?.cancel();
+    _failureTimer?.cancel();
     _progressController.stop();
     setState(() {
       _hasNoFace = true;
       _scanPhase = 'No face detected';
     });
 
-    // Auto-redirect to fingerprint: 4–6 seconds
-    final redirectMs = 4000 + math.Random().nextInt(2001);
+    // Auto-redirect to fingerprint: 5–7 seconds so merchant can see the state
+    final redirectMs = 5000 + math.Random().nextInt(2001);
     _autoFingerprintTimer?.cancel();
     _autoFingerprintTimer = Timer(Duration(milliseconds: redirectMs), () {
       if (mounted && _hasNoFace) {
@@ -161,21 +193,20 @@ class _FaceScanScreenState extends State<FaceScanScreen>
 
   void _retryScan() {
     _autoFingerprintTimer?.cancel();
+    _failureTimer?.cancel();
+    _progressController.reset();
     setState(() {
       _hasNoFace = false;
       _scanPhase = 'Initializing camera…';
     });
-    _progressController.reset();
-    final scanMs = 3000 + math.Random().nextInt(2001);
-    _progressController.duration = Duration(milliseconds: scanMs);
-    _startPhaseLabels(scanMs);
-    _progressController.forward();
+    _startScan();
   }
 
   @override
   void dispose() {
     _autoFingerprintTimer?.cancel();
     _phaseTimer?.cancel();
+    _failureTimer?.cancel();
     _cameraController?.dispose();
     _progressController.dispose();
     super.dispose();
