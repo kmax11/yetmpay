@@ -1,4 +1,4 @@
-# yetpay
+# Yetmpay
 
 A new Flutter project.
 

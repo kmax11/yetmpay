@@ -1,4 +1,4 @@
-package com.example.yetpay
+package com.example.Yetmpay
 
 import io.flutter.embedding.android.FlutterActivity
 
