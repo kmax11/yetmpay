@@ -101,7 +101,7 @@ class _LinkBankScreenState extends State<LinkBankScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const AppBackButton(),
+                  const AppBackButton(fallbackLocation: '/register'),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.md,

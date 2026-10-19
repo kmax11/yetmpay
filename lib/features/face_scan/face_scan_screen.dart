@@ -232,7 +232,13 @@ class _FaceScanScreenState extends State<FaceScanScreen>
                       size: 24,
                       color: AppColors.subtleMuted,
                     ),
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/charging');
+                      }
+                    },
                   ),
                   Text(
                     '${AppStrings.charging} ${payment.displayAmount} ETB',
@@ -444,7 +450,11 @@ class _FaceScanScreenState extends State<FaceScanScreen>
                 onPressed: () {
                   _autoFingerprintTimer?.cancel();
                   payment.reset();
-                  Navigator.of(context).pop();
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/charging');
+                  }
                 },
               ),
               const SizedBox(height: AppSpacing.sm),
