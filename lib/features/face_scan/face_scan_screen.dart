@@ -13,8 +13,6 @@ import '../../core/widgets/app_progress_bar.dart';
 import '../../core/widgets/app_scan_viewport.dart';
 import '../../core/widgets/app_text_link_button.dart';
 import '../charging/payment_notifier.dart';
-import '../terminal/terminal_notifier.dart';
-import '../transactions/transaction_notifier.dart';
 
 /// Face Scan Verification Screen (Figma node 1-537).
 ///
@@ -151,25 +149,22 @@ class _FaceScanScreenState extends State<FaceScanScreen>
 
   void _handleVerificationComplete() {
     final payment = context.read<PaymentNotifier>();
-    final amount = payment.numericAmount > 0 ? payment.numericAmount : 350.00;
-    final rail = payment.selectedRailName;
-    final phone = payment.recipientPhone;
 
-    payment.markSuccess();
+    // Generate a transaction ID for this attempt.
+    final txId =
+        'TXN-${DateTime.now().millisecondsSinceEpoch.toString().substring(4)}-ET';
 
-    // Record in shared TransactionNotifier state so it is visible in Transactions screen
-    context.read<TransactionNotifier>().recordTransaction(
-          amount: amount,
-          rail: rail,
-          customerName: 'Abebe Kebede',
-          maskedAccount: phone.isNotEmpty ? '+251 $phone' : '+251 91 ••• 8821',
-          channel: '$rail Biometric Face',
-        );
+    // The mock biometric service returns only a masked name — never a photo
+    // or full account number.
+    const maskedBuyerName = 'Selam D.';
 
-    // Update terminal settled volume and counter
-    context.read<TerminalNotifier>().recordSettledSale(amount);
+    payment.enterAwaitingApproval(
+      maskedBuyerName: maskedBuyerName,
+      shopName: 'Bole Fresh Mart',
+      transactionId: txId,
+    );
 
-    context.pushReplacement('/payment-success');
+    context.pushReplacement('/approval');
   }
 
   void _triggerNoFaceError() {

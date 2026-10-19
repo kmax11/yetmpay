@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/approval/approval_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/charging/charging_screen.dart';
 import '../../features/face_scan/face_scan_screen.dart';
@@ -66,6 +67,11 @@ abstract final class AppRouter {
         path: '/payment-declined',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const PaymentDeclinedScreen(),
+      ),
+      GoRoute(
+        path: '/approval',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const ApprovalScreen(),
       ),
 
       // ── Stateful Shell Route (Shared Bottom Nav Bar) ─────────────────────

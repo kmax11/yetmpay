@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../charging/payment_notifier.dart' show ConsentRecord;
 
 class TransactionItem {
   TransactionItem({
@@ -613,5 +614,22 @@ class TransactionNotifier extends ChangeNotifier {
   void selectTransaction(TransactionItem item) {
     _selectedTransaction = item;
     notifyListeners();
+  }
+
+  // ── Consent records ──────────────────────────────────────────────────────────
+
+  /// In-memory consent log. In production this would be flushed to secure
+  /// server-side storage. Face images are **never** saved here.
+  final List<ConsentRecord> _consentRecords = [];
+
+  List<ConsentRecord> get consentRecords => List.unmodifiable(_consentRecords);
+
+  /// Write a consent record for an approval or rejection.
+  ///
+  /// Must be called by the screen/notifier that owns the approval flow, never
+  /// from image-processing code (we do not pass face data here).
+  void saveConsentRecord(ConsentRecord record) {
+    _consentRecords.add(record);
+    // No notifyListeners needed — consent log is not shown in the UI yet.
   }
 }

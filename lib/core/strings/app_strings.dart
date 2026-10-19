@@ -220,6 +220,26 @@ abstract final class AppStrings {
       'Logging out terminates the active session on this POS terminal.';
   static const langEnglish = 'English';
   static const langAmharic = '\u12a0\u121b\u122d\u129b';
+
+  // ── Payment Approval ──────────────────────────────────────────────────────
+  static const approvalTitle = 'Confirm Payment';
+  static const approvalShopLabel = 'MERCHANT';
+  static const approvalAmountLabel = 'AMOUNT';
+  static const approvalBuyerLabel = 'PAYING AS';
+  static const approvalExpiresLabel = 'Expires in';
+  static const approvalSecondsSuffix = 's';
+  static const approvalApproveBtn = 'Approve';
+  static const approvalNotMeBtn = 'Not me';
+  static const approvalPrivacyNote =
+      'Your face is never stored. Only a masked ID is used.';
+  static const approvalTimedOut = 'Request timed out';
+  static const approvalTimedOutSub =
+      'The approval window expired. Please try again.';
+  static const approvalPinTitle = 'Enter PIN to Confirm';
+  static const approvalPinSub =
+      'High-value transaction. Please enter your 4-digit PIN.';
+  static const approvalPinConfirm = 'Confirm Payment';
+  static const approvalPinCancel = 'Cancel';
 }
 
 
