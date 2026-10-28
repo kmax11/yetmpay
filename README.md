@@ -1,6 +1,10 @@
 # Yetmpay
 
-Yetmpay is a Flutter application.
+Yetmpay is a Flutter-based digital payment and mobile wallet application.
+
+The app is designed to provide users with a simple and convenient way to manage digital payments. Its basic functionality may include securely managing payment information, sending and receiving money, viewing transaction activity, and handling everyday payment-related tasks from a mobile device.
+
+Built with Flutter, Yetmpay is intended to support multiple platforms, including Android, iOS, and web.
 
 ## Requirements
 
